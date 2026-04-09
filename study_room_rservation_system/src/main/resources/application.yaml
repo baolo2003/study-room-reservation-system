@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: study_room_reservation_system
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/srsy?useSSL=false&serverTimezone=UTC
+    username: root
+    password: js2003
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true  # 开启驼峰命名
