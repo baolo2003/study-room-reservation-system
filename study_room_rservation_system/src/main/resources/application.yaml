@@ -17,3 +17,10 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true  # 开启驼峰命名
+
+
+jwt:
+  # JWT密钥
+  SECRETKEY: mySecretKey12345678901234567890123456789012
+  # 令牌有效期：2小时
+  expiration: 7200000

@@ -1,7 +1,8 @@
-package com.baolo.study_room_rservation_system.Service;
+package com.baolo.study_room_rservation_system.Service.ServiceImpl;
 
 import com.baolo.study_room_rservation_system.Entity.User;
 import com.baolo.study_room_rservation_system.Mapper.UserMapper;
+import com.baolo.study_room_rservation_system.Service.UserService;
 import com.baolo.study_room_rservation_system.Tool.JwtUtil;
 import com.baolo.study_room_rservation_system.dto.UserLoginDTO;
 import com.baolo.study_room_rservation_system.dto.UserRegisterDTO;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 
 @Service
-public class UserserviceImpl implements UserService{
+public class UserserviceImpl implements UserService {
 
 
     @Autowired
@@ -77,15 +78,13 @@ public class UserserviceImpl implements UserService{
             throw new RuntimeException("账号已禁用");
         }
         // ========== 生成 JWT ==========
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.getRole());
-        String token = jwtUtil.generateToken(claims, user.getId().toString());
+        String token = jwtUtil.generateToken(user.getId(), user.getStudentId());
+
 
         // 封装 VO
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
         vo.setToken(token); // 把 token 给前端
-
         return vo;
     }
 
