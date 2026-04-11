@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
@@ -14,5 +16,5 @@ public class UserVO {
     private String phone;
     private String role;
     private Integer activityScore;
-    private String token;
+    private Map<String, Object> token;
 }

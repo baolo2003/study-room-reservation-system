@@ -16,11 +16,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 // 拦截所有接口
                 .addPathPatterns("/api/**")
-                // 排除无需登录的接口
+                // 排除无需拦截的接口
                 .excludePathPatterns(
                         "/api/user/register",  // 注册
                         "/api/user/login",     // 登录
-                        "/api/user/forgetPwd"  // 找回密码
+                        "/api/user/forgetPwd",  // 找回密码
+                        "/api/user/refreshtoken"// 刷新令牌
                 );
     }
 }

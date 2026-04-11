@@ -21,6 +21,8 @@ mybatis-plus:
 
 jwt:
   # JWT密钥
-  SECRETKEY: mySecretKey12345678901234567890123456789012
-  # 令牌有效期：2小时
-  expiration: 7200000
+  secret-key: mySecretKey12345678901234567890123456789012
+  # 成功令牌有效期：10 分钟
+  access-expire: 600000
+  # 刷新令牌有效期：7天
+  refresh-expire: 604800000

@@ -10,16 +10,22 @@ import com.baolo.study_room_rservation_system.vo.UserVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
 public class UserserviceImpl implements UserService {
+
+
+    private static final String ACCESS_TOKEN_KEY = "user:Token:access";
+    private static final String REFRESH_TOKEN_KEY = "user:Token:refresh";
 
 
     @Autowired
@@ -28,6 +34,9 @@ public class UserserviceImpl implements UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @Override
     public Boolean register(UserRegisterDTO userRegisterDTO) {
 
@@ -78,12 +87,19 @@ public class UserserviceImpl implements UserService {
             throw new RuntimeException("账号已禁用");
         }
         // ========== 生成 JWT ==========
-        String token = jwtUtil.generateToken(user.getId(), user.getStudentId());
+        String Accesstoken = jwtUtil.generateAccessToken(user.getId(), user.getStudentId());
 
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getStudentId());
 
+       // 保存 refreshtoken/Accesstoken 到 Redis
+       stringRedisTemplate.opsForValue().set("ACCESS_TOKEN_KEY"+user.getId(), Accesstoken,10, TimeUnit.MINUTES);
+       stringRedisTemplate.opsForValue().set("REFRESH_TOKEN_KEY"+user.getId(), refreshToken,7, TimeUnit.DAYS);
         // 封装 VO
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
+        Map<String, Object> token = new HashMap<>();
+        token.put("access_token", Accesstoken);
+        token.put("refresh_token", refreshToken);
         vo.setToken(token); // 把 token 给前端
         return vo;
     }

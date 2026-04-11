@@ -18,9 +18,13 @@ public class JwtUtil {
     // 密钥（自己随便写一串长字符串）
     @Value("${jwt.secret-key}")
     private   String SECRET_KEY;
-    // 令牌有效期 2 小时
-    @Value("${jwt.expiration}")
-    private  long EXPIRATION;
+    // 成功令牌有效期 10分钟
+    @Value("${jwt.access-expire}")
+    private  long ACCESS_EXPIRE;
+
+    //刷新令牌有效期 7天
+    @Value("${jwt.refresh-expire}")
+    private long REFRESH_EXPIRE;
 
     // 生成密钥
     private SecretKey getSecretKey() {
@@ -28,20 +32,37 @@ public class JwtUtil {
     }
 
     /**
-     * 生成JWT令牌
+     * 生成成功的JWT令牌
      * @param userId 用户ID
      * @param studentId 学号
      * @return 令牌字符串
      */
-    public String generateToken(Long userId, String studentId) {
+    public String generateAccessToken(Long userId, String studentId) {
         // 设置令牌Claims
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("studentId", studentId);
         return Jwts.builder()
-                .setClaims(claims)
+                .setClaims(claims)//将用户id和学号保存在playload中
+                .setIssuedAt(new Date())//设置令牌创建时间
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRE))//设置令牌有效期
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+
+    /**
+     * 生成刷新令牌
+     */
+    public String generateRefreshToken(Long userId, String studentId) {
+
+        Map<String,Object>claims=new HashMap<>();
+        claims.put("userId",userId);
+        claims.put("studentId",studentId);
+        return Jwts.builder().
+                setClaims( claims)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis()+REFRESH_EXPIRE))
                 .signWith(getSecretKey())
                 .compact();
     }

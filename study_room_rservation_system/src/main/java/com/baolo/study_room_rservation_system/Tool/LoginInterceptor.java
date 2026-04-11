@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -15,6 +16,10 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+
     /**
      *
      * 拦截登录注册以外的请求
@@ -23,10 +28,6 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
-
-
-        String path = request.getRequestURI();
-        System.out.println("拦截器拦截路径: " + path);
 
         // 1. 从请求头获取token
         String authHeader = request.getHeader("Authorization");
@@ -40,10 +41,16 @@ public class LoginInterceptor implements HandlerInterceptor {
             throw new CustomizeException(401, "令牌无效或已过期");
         }
 
+        Long userId = jwtUtil.getUserId(jwtUtil.parseToken(token));
+        //查看redis中是否存在该token
+        String accessKeyToken = stringRedisTemplate.opsForValue().get("ACCESS_TOKEN_KEY"+userId);
+
+       if (accessKeyToken == null || !accessKeyToken.equals(token))
+       {
+           throw new CustomizeException(401, "您已登出或token失效");
+       }
         // 3. 解析令牌，获取用户信息并存入ThreadLocal
-        Claims claims = jwtUtil.parseToken(token);
-        Long userId = jwtUtil.getUserId(claims);
-        String studentId = jwtUtil.getStudentId(claims);
+        UserContext.setCurrentUser(String.valueOf(userId));
         // 4. 放行
         return true;
 
