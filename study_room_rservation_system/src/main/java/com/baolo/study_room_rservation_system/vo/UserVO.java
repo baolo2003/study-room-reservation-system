@@ -16,5 +16,6 @@ public class UserVO {
     private String phone;
     private String role;
     private Integer activityScore;
+    private String preference;
     private Map<String, Object> token;
 }

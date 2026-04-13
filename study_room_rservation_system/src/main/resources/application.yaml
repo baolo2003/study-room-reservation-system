@@ -23,6 +23,6 @@ jwt:
   # JWT密钥
   secret-key: mySecretKey12345678901234567890123456789012
   # 成功令牌有效期：10 分钟
-  access-expire: 600000
+  access-expire: 604800000
   # 刷新令牌有效期：7天
   refresh-expire: 604800000

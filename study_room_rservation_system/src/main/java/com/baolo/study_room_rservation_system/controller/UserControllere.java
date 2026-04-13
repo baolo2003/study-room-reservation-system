@@ -7,12 +7,16 @@ import com.baolo.study_room_rservation_system.Tool.Result;
 import com.baolo.study_room_rservation_system.Tool.UserContext;
 import com.baolo.study_room_rservation_system.dto.UserLoginDTO;
 import com.baolo.study_room_rservation_system.dto.UserRegisterDTO;
+import com.baolo.study_room_rservation_system.vo.ReservationListVO;
 import com.baolo.study_room_rservation_system.vo.UserVO;
 import io.jsonwebtoken.Claims;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -100,5 +104,50 @@ public class UserControllere {
         // 5. 只返回新的 AccessToken
         return Result.success(newAccessToken);
     }
+
+    /**
+     * 修改密码
+     */
+    @PutMapping("/updatePassword")
+    public Result updatepassword(@RequestParam String studentId, @RequestParam String password)
+    {
+
+        log.info("修改密码：{}", studentId);
+        userService.updatePassword(studentId, password);
+        return Result.success("修改密码成功");
+    }
+
+    /**
+     * 获取用户信息
+     */
+    @GetMapping("/Info")
+    public Result<UserVO> getUserInfo()
+    {
+            log.info("获取用户信息");
+            return Result.success(userService.getUserInfo());
+    }
+
+    /**
+     * 修改用户信息
+     */
+    @PutMapping("/Info")
+    public Result updateUserInfo(@RequestBody UserVO userVO)
+    {
+       log.info("修改用户信息：{}",userVO.getId() );
+       userService.updateUserInfo(userVO);
+       return Result.success("修改成功");
+    }
+    /**
+     * 查询用户预约记录
+     */
+    @GetMapping("/reservation")
+    public Result<List<ReservationListVO>> getReservation(@RequestParam Integer status,
+                                       @RequestParam(defaultValue = "1") Integer pageNum,
+                                       @RequestParam(defaultValue = "10") Integer pageSize)
+    {
+       log.info("查询用户预约记录");
+       return Result.success(userService.getReservationlist(status, pageNum, pageSize));
+    }
+
 }
 

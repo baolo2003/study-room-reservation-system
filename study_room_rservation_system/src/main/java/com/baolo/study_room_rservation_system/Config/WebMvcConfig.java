@@ -1,4 +1,4 @@
-package com.baolo.study_room_rservation_system.WebMvcConfig;
+package com.baolo.study_room_rservation_system.Config;
 
 import com.baolo.study_room_rservation_system.Tool.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

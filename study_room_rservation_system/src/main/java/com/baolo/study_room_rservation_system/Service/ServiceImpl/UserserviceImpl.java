@@ -1,13 +1,23 @@
 package com.baolo.study_room_rservation_system.Service.ServiceImpl;
 
+import com.baolo.study_room_rservation_system.Entity.Classroom;
+import com.baolo.study_room_rservation_system.Entity.Reservation;
+import com.baolo.study_room_rservation_system.Entity.Seat;
 import com.baolo.study_room_rservation_system.Entity.User;
+import com.baolo.study_room_rservation_system.Mapper.ClassroomMapper;
+import com.baolo.study_room_rservation_system.Mapper.ReservationMapper;
+import com.baolo.study_room_rservation_system.Mapper.SeatMapper;
 import com.baolo.study_room_rservation_system.Mapper.UserMapper;
 import com.baolo.study_room_rservation_system.Service.UserService;
 import com.baolo.study_room_rservation_system.Tool.JwtUtil;
+import com.baolo.study_room_rservation_system.Tool.UserContext;
 import com.baolo.study_room_rservation_system.dto.UserLoginDTO;
 import com.baolo.study_room_rservation_system.dto.UserRegisterDTO;
+import com.baolo.study_room_rservation_system.vo.ReservationListVO;
 import com.baolo.study_room_rservation_system.vo.UserVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -16,8 +26,10 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,6 +42,15 @@ public class UserserviceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ReservationMapper reservationMapper;
+
+    @Autowired
+    private ClassroomMapper classroomMapper;
+
+    @Autowired
+    private SeatMapper seatMapper;
 
 
     @Autowired
@@ -103,5 +124,124 @@ public class UserserviceImpl implements UserService {
         vo.setToken(token); // 把 token 给前端
         return vo;
     }
+
+    /**
+     * 修改密码
+     * @param studentId
+     * @param password
+     */
+    @Override
+    public void updatePassword(String studentId, String password) {
+        //先查寻用户
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getStudentId, studentId);
+        User user = userMapper.selectOne(wrapper);
+        if (user == null)
+        {
+            throw new RuntimeException("用户不存在");
+        }
+        //对密码进行加密
+        String md5Pwd = DigestUtils.md5DigestAsHex(password.getBytes());
+        //修改密码
+        user.setPassword(md5Pwd);
+        //保存到数据库
+        userMapper.update(user, wrapper);
+    }
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    @Override
+    public UserVO getUserInfo() {
+        //获取当前用户ID
+        String userId =  UserContext.getCurrentUser();
+        //查询用户信息
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getId, userId);
+        User user = userMapper.selectOne(wrapper);
+        //判断用户是否存在
+        if(user == null)
+        {
+            throw new RuntimeException("用户不存在");
+        }
+        //封装VO
+        UserVO vo = new UserVO();
+       vo.setName(user.getName());
+       vo.setStudentId(user.getStudentId());
+       vo.setPhone(user.getPhone());
+       vo.setActivityScore(user.getActivityScore());
+       vo.setId(user.getId());
+        return vo;
+    }
+
+    /**
+     * 修改用户信息
+     * @param userVO
+     */
+    @Override
+    public void updateUserInfo(UserVO userVO) {
+        //根据用户ID查询用户信息
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getId, userVO.getId());
+        User user = userMapper.selectOne(wrapper);
+        if(user == null)
+        {
+            throw new RuntimeException("用户不存在");
+        }
+        //修改用户信息
+        user.setName(userVO.getName());
+        user.setPhone(userVO.getPhone());
+        user.setPreference(userVO.getPreference());
+        //保存到数据库
+        userMapper.update(user, wrapper);
+    }
+
+    /**
+     * 查询预约列表
+     * @return
+     */
+    @Override
+    public List<ReservationListVO> getReservationlist(Integer status, Integer pageNum, Integer pageSize) {
+        //获取当前用户ID
+        String userId = UserContext.getCurrentUser();
+        LambdaQueryWrapper<Reservation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Reservation::getUserId, Long.parseLong(userId));
+        //筛选状态
+        if (status != null)
+        {
+            wrapper.eq(Reservation::getStatus, String.valueOf(status));
+        }
+        wrapper.orderByDesc(Reservation::getCreateTime);
+        //分页查询
+        Page<Reservation> page = new Page<>(pageNum, pageSize);
+        Page<Reservation> reservationPage = reservationMapper.selectPage(page, wrapper);
+        //封装VO
+        return reservationPage.getRecords().stream()
+                .map(reservation -> {
+                    ReservationListVO vo = new ReservationListVO();
+                    BeanUtils.copyProperties(reservation, vo);
+
+                    Seat seat = seatMapper.selectById(reservation.getSeatId());
+                    if (seat != null) {
+
+                        vo.setSeatNo(seat.getSeatNo());
+
+
+                        // ================== 封装 教室信息 ==================
+                        Classroom classroom = classroomMapper.selectById(seat.getClassroomId());
+                        if (classroom != null) {
+
+                            vo.setClassroomName(classroom.getName());
+                        }
+                    }
+
+                    return vo;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 
 }
