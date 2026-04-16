@@ -5,23 +5,21 @@ import com.baolo.study_room_rservation_system.Entity.User;
 import com.baolo.study_room_rservation_system.Enum.ActivityRankTimeEnum;
 import com.baolo.study_room_rservation_system.Enum.ActivityTypeEnum;
 import com.baolo.study_room_rservation_system.Mapper.UserMapper;
+import com.baolo.study_room_rservation_system.Service.UserActivityRankService;
 import com.baolo.study_room_rservation_system.dto.UserActivityDTO;
 import com.baolo.study_room_rservation_system.vo.RankItemVo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import org.redisson.client.RedisClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
-public class UserActivityRankServiceImpl implements UserActivityRankService{
+public class UserActivityRankServiceImpl implements UserActivityRankService {
 
     private static final String ACTIVITY_SCORE_KEY = "activity_rank_";//用户活跃度key
 

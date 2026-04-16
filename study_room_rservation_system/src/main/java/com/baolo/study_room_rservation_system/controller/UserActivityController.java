@@ -1,13 +1,11 @@
 package com.baolo.study_room_rservation_system.controller;
 
-import com.baolo.study_room_rservation_system.Service.ServiceImpl.UserActivityRankService;
-import com.baolo.study_room_rservation_system.Service.ServiceImpl.UserActivityRankServiceImpl;
+import com.baolo.study_room_rservation_system.Service.UserActivityRankService;
 import com.baolo.study_room_rservation_system.Tool.Result;
 import com.baolo.study_room_rservation_system.dto.UserActivityDTO;
 import com.baolo.study_room_rservation_system.vo.RankItemVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,17 +19,7 @@ public class UserActivityController {
     @Autowired
     private UserActivityRankService userActivityRankService;
 
-    /**
-     * 更新用户活跃度
-     */
-    @PutMapping("/Rank")
-    public Result updateUserActivity(@RequestBody UserActivityDTO userActivityDTO) {
-        log.info("更新用户活跃度");
 
-        //调用方法进行更新
-        userActivityRankService.updateUserActivity(userActivityDTO);
-        return Result.success("更新成功");
-    }
     /**
      * 获取用户活跃度和排行
      */

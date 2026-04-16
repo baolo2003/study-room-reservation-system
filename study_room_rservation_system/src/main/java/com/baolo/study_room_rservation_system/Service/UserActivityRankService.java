@@ -1,4 +1,4 @@
-package com.baolo.study_room_rservation_system.Service.ServiceImpl;
+package com.baolo.study_room_rservation_system.Service;
 
 import com.baolo.study_room_rservation_system.dto.UserActivityDTO;
 import com.baolo.study_room_rservation_system.vo.RankItemVo;

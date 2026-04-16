@@ -27,7 +27,5 @@ public class Reservation {
      private LocalDateTime signInTime;
      private LocalDateTime signOutTime;
 
-// // 非数据库字段：关联座位信息
-// @TableField(exist = false)
-// private Seat seat;
+
 }

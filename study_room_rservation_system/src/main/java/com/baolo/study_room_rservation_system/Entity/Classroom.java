@@ -13,7 +13,7 @@ public class Classroom {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
-    private String openTime;
+    private String openTime;// 开放时间
     private Integer status;
     private LocalDateTime createTime;
     private Integer seatCount;

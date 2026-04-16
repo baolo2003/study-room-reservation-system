@@ -22,7 +22,7 @@ public class Seat {
     private Integer isWindow;
     private Integer hasSocket;
     private Integer isQuiet;
-    private Integer status;
+    private Integer status;//0-空闲 1-预约中 2-使用中 3-已取消
     private Integer version;
     private LocalDateTime createTime;
 
