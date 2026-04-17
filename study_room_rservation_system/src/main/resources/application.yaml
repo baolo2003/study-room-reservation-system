@@ -26,3 +26,9 @@ jwt:
   access-expire: 604800000
   # 刷新令牌有效期：7天
   refresh-expire: 604800000
+
+# DeepSeek API 配置
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY}
+  base-url: https://api.deepseek.com
+  model: deepseek-chat

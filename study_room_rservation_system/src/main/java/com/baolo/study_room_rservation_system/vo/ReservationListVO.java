@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 @Data
 public class ReservationListVO {
     private Long id;
+    private Long userId;
+    private Long seatId;
+    private String StudentId;
+    private Long classroomId;
     private LocalDateTime startTime; // 预约开始时间
     private LocalDateTime endTime;   // 预约结束时间
     private Integer status;          // 状态码
@@ -15,4 +19,6 @@ public class ReservationListVO {
     private LocalDateTime signOutTime;// 签退时间
     private String seatNo;// 座位号
     private String classroomName;// 教室名称
+    private String userName;
 }
+
